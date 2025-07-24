@@ -5,8 +5,10 @@ import logger from "@server/logger";
 import HttpCode from "@server/types/HttpCode";
 import config from "@server/lib/config";
 import { orgs, resources, sites, Target, targets } from "@server/db";
+import { buildHostSniRule } from "./utils";
 
 let currentExitNodeId: number;
+
 
 export async function traefikConfigProvider(
     _: Request,
@@ -379,10 +381,11 @@ export async function traefikConfigProvider(
                     };
                 }
 
+                const hostSniRule = buildHostSniRule(protocol, resource.fullDomain);
                 config_output[protocol].routers[routerName] = {
                     entryPoints: [`${protocol}-${port}`],
                     service: serviceName,
-                    ...(protocol === "tcp" ? { rule: "HostSNI(`*`)" } : {})
+                    ...(hostSniRule ? { rule: hostSniRule } : {})
                 };
 
                 config_output[protocol].services[serviceName] = {
