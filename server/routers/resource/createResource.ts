@@ -59,9 +59,20 @@ const createRawResourceSchema = z
         siteId: z.number(),
         http: z.boolean(),
         protocol: z.enum(["tcp", "udp"]),
-        proxyPort: z.number().int().min(1).max(65535)
+        proxyPort: z.number().int().min(1).max(65535),
+        domainId: z.string().optional(),
+        subdomain: z.string().nullable().optional()
     })
     .strict()
+    .refine(
+        (data) => {
+            if (data.subdomain) {
+                return subdomainSchema.safeParse(data.subdomain).success;
+            }
+            return true;
+        },
+        { message: "Invalid subdomain" }
+    )
     .refine(
         (data) => {
             if (!config.getRawConfig().flags?.allow_raw_resources) {
@@ -378,7 +389,8 @@ async function createRawResource(
         );
     }
 
-    const { name, http, protocol, proxyPort } = parsedBody.data;
+    const { name, http, protocol, proxyPort, domainId } = parsedBody.data;
+    let subdomain = parsedBody.data.subdomain;
 
     // if http is false check to see if there is already a resource with the same port and protocol
     const existingResource = await db
@@ -400,6 +412,90 @@ async function createRawResource(
         );
     }
 
+    let fullDomain = "";
+    if (domainId) {
+        const [domainRes] = await db
+            .select()
+            .from(domains)
+            .where(eq(domains.domainId, domainId))
+            .leftJoin(
+                orgDomains,
+                and(eq(orgDomains.orgId, orgId), eq(orgDomains.domainId, domainId))
+            );
+
+        if (!domainRes || !domainRes.domains) {
+            return next(
+                createHttpError(
+                    HttpCode.NOT_FOUND,
+                    `Domain with ID ${domainId} not found`
+                )
+            );
+        }
+
+        if (domainRes.orgDomains && domainRes.orgDomains.orgId !== orgId) {
+            return next(
+                createHttpError(
+                    HttpCode.FORBIDDEN,
+                    `Organization does not have access to domain with ID ${domainId}`
+                )
+            );
+        }
+
+        if (!domainRes.domains.verified) {
+            return next(
+                createHttpError(
+                    HttpCode.BAD_REQUEST,
+                    `Domain with ID ${domainRes.domains.domainId} is not verified`
+                )
+            );
+        }
+
+        if (domainRes.domains.type == "ns") {
+            if (subdomain) {
+                fullDomain = `${subdomain}.${domainRes.domains.baseDomain}`;
+            } else {
+                fullDomain = domainRes.domains.baseDomain;
+            }
+        } else if (domainRes.domains.type == "cname") {
+            fullDomain = domainRes.domains.baseDomain;
+        } else if (domainRes.domains.type == "wildcard") {
+            if (subdomain) {
+                const parsedSubdomain = subdomainSchema.safeParse(subdomain);
+                if (!parsedSubdomain.success) {
+                    return next(
+                        createHttpError(
+                            HttpCode.BAD_REQUEST,
+                            fromError(parsedSubdomain.error).toString()
+                        )
+                    );
+                }
+                fullDomain = `${subdomain}.${domainRes.domains.baseDomain}`;
+            } else {
+                fullDomain = domainRes.domains.baseDomain;
+            }
+        }
+
+        if (fullDomain === domainRes.domains.baseDomain) {
+            subdomain = null;
+        }
+
+        fullDomain = fullDomain.toLowerCase();
+
+        const existingDomain = await db
+            .select()
+            .from(resources)
+            .where(eq(resources.fullDomain, fullDomain));
+
+        if (existingDomain.length > 0) {
+            return next(
+                createHttpError(
+                    HttpCode.CONFLICT,
+                    "Resource with that domain already exists"
+                )
+            );
+        }
+    }
+
     let resource: Resource | undefined;
 
     await db.transaction(async (trx) => {
@@ -411,7 +507,10 @@ async function createRawResource(
                 name,
                 http,
                 protocol,
-                proxyPort
+                proxyPort,
+                domainId: domainId ?? null,
+                subdomain: domainId ? subdomain : undefined,
+                fullDomain: domainId ? fullDomain : undefined
             })
             .returning();
 
