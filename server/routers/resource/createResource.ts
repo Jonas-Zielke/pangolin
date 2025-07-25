@@ -38,6 +38,7 @@ const createHttpResourceSchema = z
             .nullable()
             .optional(),
         siteId: z.number(),
+        tags: z.array(z.string()).optional(),
         http: z.boolean(),
         protocol: z.enum(["tcp", "udp"]),
         domainId: z.string()
@@ -57,6 +58,7 @@ const createRawResourceSchema = z
     .object({
         name: z.string().min(1).max(255),
         siteId: z.number(),
+        tags: z.array(z.string()).optional(),
         http: z.boolean(),
         protocol: z.enum(["tcp", "udp"]),
         proxyPort: z.number().int().min(1).max(65535),
@@ -313,6 +315,7 @@ async function createHttpResource(
                 orgId,
                 name,
                 subdomain,
+                tags: JSON.stringify(parsedBody.data.tags ?? []),
                 http: true,
                 protocol: "tcp",
                 ssl: true
@@ -510,7 +513,8 @@ async function createRawResource(
                 proxyPort,
                 domainId: domainId ?? null,
                 subdomain: domainId ? subdomain : undefined,
-                fullDomain: domainId ? fullDomain : undefined
+                fullDomain: domainId ? fullDomain : undefined,
+                tags: JSON.stringify(parsedBody.data.tags ?? [])
             })
             .returning();
 

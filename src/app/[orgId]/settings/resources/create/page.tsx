@@ -64,10 +64,12 @@ import CopyTextBox from "@app/components/CopyTextBox";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import DomainPicker from "@app/components/DomainPicker";
+import { Tag, TagInput } from "@app/components/tags/tag-input";
 
 const baseResourceFormSchema = z.object({
     name: z.string().min(1).max(255),
     siteId: z.number(),
+    tags: z.array(z.any()).optional(),
     http: z.boolean()
 });
 
@@ -110,6 +112,7 @@ export default function Page() {
     >([]);
     const [createLoading, setCreateLoading] = useState(false);
     const [showSnippets, setShowSnippets] = useState(false);
+    const [activeTagsIndex, setActiveTagsIndex] = useState<number | null>(null);
     const [resourceId, setResourceId] = useState<number | null>(null);
 
     const resourceTypes: ReadonlyArray<ResourceTypeOption> = [
@@ -133,7 +136,8 @@ export default function Page() {
         resolver: zodResolver(baseResourceFormSchema),
         defaultValues: {
             name: "",
-            http: true
+            http: true,
+            tags: []
         }
     });
 
@@ -162,7 +166,8 @@ export default function Page() {
             const payload = {
                 name: baseData.name,
                 siteId: baseData.siteId,
-                http: baseData.http
+                http: baseData.http,
+                tags: (baseData.tags || []).map((t: Tag) => t.text)
             };
 
             if (isHttp) {
@@ -338,10 +343,30 @@ export default function Page() {
                                                                 {t(
                                                                     "resourceNameDescription"
                                                                 )}
-                                                            </FormDescription>
-                                                        </FormItem>
-                                                    )}
-                                                />
+                                                    </FormDescription>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={baseForm.control}
+                                                name="tags"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>{t("exitNodeTags")}</FormLabel>
+                                                        <TagInput
+                                                            tags={field.value || []}
+                                                            setTags={field.onChange}
+                                                            placeholder="Add tags"
+                                                            activeTagIndex={activeTagsIndex}
+                                                            setActiveTagIndex={setActiveTagsIndex}
+                                                        />
+                                                        <FormDescription>
+                                                            {t("exitNodeTagsDescription")}
+                                                        </FormDescription>
+                                                    </FormItem>
+                                                )}
+                                            />
 
                                                 <FormField
                                                     control={baseForm.control}

@@ -62,6 +62,7 @@ Pangolin is a self-hosted tunneled reverse proxy server with identity and access
 - Automated **SSL certificates** (https) via [LetsEncrypt](https://letsencrypt.org/).
 - Support for HTTP/HTTPS and **raw TCP/UDP services**.
 - Load balancing.
+- Exit node tagging for resources, enabling round-robin across matching sites.
 - Extend functionality with existing [Traefik](https://github.com/traefik/traefik) plugins, such as [CrowdSec](https://plugins.traefik.io/plugins/6335346ca4caa9ddeffda116/crowdsec-bouncer-traefik-plugin) and [Geoblock](https://github.com/PascalMinder/geoblock).
     - **Automatically install and configure Crowdsec via Pangolin's installer script.**
 - Attach as many sites to the central server as you wish.
