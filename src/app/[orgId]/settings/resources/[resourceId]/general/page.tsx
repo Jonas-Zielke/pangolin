@@ -237,6 +237,7 @@ export default function GeneralForm() {
                 enabled: data.enabled,
                 name: data.name,
                 subdomain: data.subdomain,
+                domainId: data.domainId,
                 fullDomain: resource.fullDomain,
                 proxyPort: data.proxyPort
             });
@@ -382,29 +383,25 @@ export default function GeneralForm() {
                                             </>
                                         )}
 
-                                        {resource.http && (
-                                            <div className="space-y-2">
-                                                <Label>Domain</Label>
-                                                <div className="border p-2 rounded-md flex items-center justify-between">
-                                                    <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                                        <Globe size="14" />
-                                                        {resourceFullDomain}
-                                                    </span>
-                                                    <Button
-                                                        variant="secondary"
-                                                        type="button"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            setEditDomainOpen(
-                                                                true
-                                                            )
-                                                        }
-                                                    >
-                                                        Edit Domain
-                                                    </Button>
-                                                </div>
+                                        <div className="space-y-2">
+                                            <Label>Domain</Label>
+                                            <div className="border p-2 rounded-md flex items-center justify-between">
+                                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                                    <Globe size="14" />
+                                                    {resourceFullDomain}
+                                                </span>
+                                                <Button
+                                                    variant="secondary"
+                                                    type="button"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        setEditDomainOpen(true)
+                                                    }
+                                                >
+                                                    Edit Domain
+                                                </Button>
                                             </div>
-                                        )}
+                                        </div>
                                     </form>
                                 </Form>
                             </SettingsSectionForm>
