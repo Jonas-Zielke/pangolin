@@ -99,6 +99,11 @@ export default async function ResourceLayout(props: ResourceLayoutProps) {
         }
     ];
 
+    navItems.push({
+        title: t('tunnel'),
+        href: `/{orgId}/settings/resources/{resourceId}/tunnel`
+    });
+
     if (resource.http) {
         navItems.push({
             title: t('authentication'),
