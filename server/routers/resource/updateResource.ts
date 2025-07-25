@@ -46,7 +46,8 @@ const updateHttpResourceBodySchema = z
         enabled: z.boolean().optional(),
         stickySession: z.boolean().optional(),
         tlsServerName: z.string().nullable().optional(),
-        setHostHeader: z.string().nullable().optional()
+        setHostHeader: z.string().nullable().optional(),
+        tags: z.array(z.string()).optional()
     })
     .strict()
     .refine((data) => Object.keys(data).length > 0, {
@@ -95,7 +96,8 @@ const updateRawResourceBodySchema = z
         stickySession: z.boolean().optional(),
         enabled: z.boolean().optional(),
         domainId: z.string().optional(),
-        subdomain: z.string().nullable().optional()
+        subdomain: z.string().nullable().optional(),
+        tags: z.array(z.string()).optional()
     })
     .strict()
     .refine((data) => Object.keys(data).length > 0, {
@@ -240,7 +242,10 @@ async function updateHttpResource(
         );
     }
 
-    const updateData = parsedBody.data;
+    let updateData: any = parsedBody.data;
+    if (updateData.tags) {
+        updateData.tags = JSON.stringify(updateData.tags);
+    }
 
     if (updateData.domainId) {
         const domainId = updateData.domainId;
@@ -352,7 +357,7 @@ async function updateHttpResource(
 
     const updatedResource = await db
         .update(resources)
-        .set({...updateData, })
+        .set(updateData)
         .where(eq(resources.resourceId, resource.resourceId))
         .returning();
 
@@ -398,7 +403,10 @@ async function updateRawResource(
         );
     }
 
-    const updateData = parsedBody.data;
+    let updateData: any = parsedBody.data;
+    if (updateData.tags) {
+        updateData.tags = JSON.stringify(updateData.tags);
+    }
 
     if (updateData.proxyPort) {
         const proxyPort = updateData.proxyPort;

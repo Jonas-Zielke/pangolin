@@ -105,7 +105,8 @@ export const resources = sqliteTable("resources", {
         .notNull()
         .default(false),
     tlsServerName: text("tlsServerName"),
-    setHostHeader: text("setHostHeader")
+    setHostHeader: text("setHostHeader"),
+    tags: text("tags") // comma separated or json array of tags
 });
 
 export const targets = sqliteTable("targets", {
