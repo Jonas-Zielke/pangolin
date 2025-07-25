@@ -379,11 +379,58 @@ export async function traefikConfigProvider(
                     };
                 }
 
-                config_output[protocol].routers[routerName] = {
+                const routerConfig: any = {
                     entryPoints: [`${protocol}-${port}`],
-                    service: serviceName,
-                    ...(protocol === "tcp" ? { rule: "HostSNI(`*`)" } : {})
+                    service: serviceName
                 };
+
+                if (protocol === "tcp") {
+                    if (resource.domainId) {
+                        const domainParts = fullDomain.split(".");
+                        let wildCard;
+                        if (domainParts.length <= 2) {
+                            wildCard = `*.${domainParts.join(".")}`;
+                        } else {
+                            wildCard = `*.${domainParts.slice(1).join(".")}`;
+                        }
+
+                        if (!resource.subdomain) {
+                            wildCard = resource.fullDomain;
+                        }
+
+                        const configDomain = config.getDomain(resource.domainId);
+
+                        let certResolver: string, preferWildcardCert: boolean;
+                        if (!configDomain) {
+                            certResolver = config.getRawConfig().traefik.cert_resolver;
+                            preferWildcardCert =
+                                config.getRawConfig().traefik.prefer_wildcard_cert;
+                        } else {
+                            certResolver = configDomain.cert_resolver;
+                            preferWildcardCert = configDomain.prefer_wildcard_cert;
+                        }
+
+                        const tls = {
+                            certResolver: certResolver,
+                            ...(preferWildcardCert
+                                ? {
+                                      domains: [
+                                          {
+                                              main: wildCard
+                                          }
+                                      ]
+                                  }
+                                : {})
+                        };
+
+                        routerConfig.rule = `HostSNI(\`${preferWildcardCert ? wildCard : fullDomain}\`)`;
+                        routerConfig.tls = tls;
+                    } else {
+                        routerConfig.rule = "HostSNI(`*`)";
+                    }
+                }
+
+                config_output[protocol].routers[routerName] = routerConfig;
 
                 config_output[protocol].services[serviceName] = {
                     loadBalancer: {
