@@ -7,6 +7,7 @@ import config from "@server/lib/config";
 import { orgs, resources, sites, Target, targets } from "@server/db";
 
 let currentExitNodeId: number;
+let roundRobinIndex = 0;
 
 export async function traefikConfigProvider(
     _: Request,
@@ -17,6 +18,27 @@ export async function traefikConfigProvider(
         const allResources = await db.transaction(async (tx) => {
             // First query to get resources with site and org info
             // Get the current exit node name from config
+            if (config.getRawConfig().gerbil.exit_node_tags?.length) {
+                const nodes = await tx.select().from(exitNodes);
+                const filtered = nodes.filter((n) => {
+                    const nodeTags = Array.isArray((n as any).tags)
+                        ? ((n as any).tags as string[])
+                        : n.tags
+                        ? JSON.parse((n as any).tags as string)
+                        : [];
+                    return config
+                        .getRawConfig()
+                        .gerbil.exit_node_tags!.some((t: string) =>
+                            nodeTags.includes(t)
+                        );
+                });
+                if (filtered.length) {
+                    const idx = roundRobinIndex % filtered.length;
+                    currentExitNodeId = (filtered[idx] as any).exitNodeId;
+                    roundRobinIndex = (idx + 1) % filtered.length;
+                }
+            }
+
             if (!currentExitNodeId) {
                 if (config.getRawConfig().gerbil.exit_node_name) {
                     const exitNodeName =
