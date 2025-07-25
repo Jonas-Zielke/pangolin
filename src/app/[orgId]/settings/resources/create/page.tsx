@@ -78,7 +78,9 @@ const httpResourceFormSchema = z.object({
 
 const tcpUdpResourceFormSchema = z.object({
     protocol: z.string(),
-    proxyPort: z.number().int().min(1).max(65535)
+    proxyPort: z.number().int().min(1).max(65535),
+    domainId: z.string().optional(),
+    subdomain: z.string().optional()
 });
 
 type BaseResourceFormValues = z.infer<typeof baseResourceFormSchema>;
@@ -144,7 +146,9 @@ export default function Page() {
         resolver: zodResolver(tcpUdpResourceFormSchema),
         defaultValues: {
             protocol: "tcp",
-            proxyPort: undefined
+            proxyPort: undefined,
+            domainId: undefined,
+            subdomain: undefined
         }
     });
 
@@ -172,7 +176,9 @@ export default function Page() {
                 const tcpUdpData = tcpUdpForm.getValues();
                 Object.assign(payload, {
                     protocol: tcpUdpData.protocol,
-                    proxyPort: tcpUdpData.proxyPort
+                    proxyPort: tcpUdpData.proxyPort,
+                    domainId: tcpUdpData.domainId,
+                    subdomain: tcpUdpData.subdomain
                 });
             }
 
@@ -511,6 +517,19 @@ export default function Page() {
                                         </SettingsSectionDescription>
                                     </SettingsSectionHeader>
                                     <SettingsSectionBody>
+                                        <DomainPicker
+                                            orgId={orgId as string}
+                                            onDomainChange={(res) => {
+                                                tcpUdpForm.setValue(
+                                                    "subdomain",
+                                                    res.subdomain
+                                                );
+                                                tcpUdpForm.setValue(
+                                                    "domainId",
+                                                    res.domainId
+                                                );
+                                            }}
+                                        />
                                         <SettingsSectionForm>
                                             <Form {...tcpUdpForm}>
                                                 <form
