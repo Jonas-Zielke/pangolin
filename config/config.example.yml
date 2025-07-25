@@ -31,6 +31,9 @@ traefik:
 gerbil:
     start_port: 51820
     base_endpoint: "localhost"
+    # exit_node_tags can be set to cycle through nodes with matching tags
+    # exit_node_tags:
+    #     - high-bandwidth
     block_size: 24
     site_block_size: 30
     subnet_group: 100.89.137.0/20

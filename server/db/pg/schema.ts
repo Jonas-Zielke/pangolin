@@ -117,7 +117,8 @@ export const exitNodes = pgTable("exitNodes", {
     publicKey: varchar("publicKey").notNull(),
     listenPort: integer("listenPort").notNull(),
     reachableAt: varchar("reachableAt"),
-    maxConnections: integer("maxConnections")
+    maxConnections: integer("maxConnections"),
+    tags: varchar("tags").array()
 });
 
 export const users = pgTable("user", {
