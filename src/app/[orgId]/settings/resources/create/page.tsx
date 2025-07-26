@@ -73,12 +73,14 @@ const baseResourceFormSchema = z.object({
 
 const httpResourceFormSchema = z.object({
     domainId: z.string().optional(),
-    subdomain: z.string().optional()
+    subdomain: subdomainSchema.optional()
 });
 
 const tcpUdpResourceFormSchema = z.object({
     protocol: z.string(),
-    proxyPort: z.number().int().min(1).max(65535)
+    proxyPort: z.number().int().min(1).max(65535),
+    domainId: z.string().optional(),
+    subdomain: subdomainSchema.optional()
 });
 
 type BaseResourceFormValues = z.infer<typeof baseResourceFormSchema>;
@@ -144,7 +146,9 @@ export default function Page() {
         resolver: zodResolver(tcpUdpResourceFormSchema),
         defaultValues: {
             protocol: "tcp",
-            proxyPort: undefined
+            proxyPort: undefined,
+            domainId: undefined,
+            subdomain: undefined
         }
     });
 
@@ -163,16 +167,18 @@ export default function Page() {
 
             if (isHttp) {
                 const httpData = httpForm.getValues();
-                    Object.assign(payload, {
-                        subdomain: httpData.subdomain,
-                        domainId: httpData.domainId,
-                        protocol: "tcp",
-                    });
+                Object.assign(payload, {
+                    subdomain: httpData.subdomain,
+                    domainId: httpData.domainId,
+                    protocol: "tcp"
+                });
             } else {
                 const tcpUdpData = tcpUdpForm.getValues();
                 Object.assign(payload, {
                     protocol: tcpUdpData.protocol,
-                    proxyPort: tcpUdpData.proxyPort
+                    proxyPort: tcpUdpData.proxyPort,
+                    domainId: tcpUdpData.domainId,
+                    subdomain: tcpUdpData.subdomain
                 });
             }
 
@@ -267,6 +273,7 @@ export default function Page() {
                     setBaseDomains(domains);
                     if (domains.length) {
                         httpForm.setValue("domainId", domains[0].domainId);
+                        tcpUdpForm.setValue("domainId", domains[0].domainId);
                     }
                 }
             };
@@ -511,12 +518,43 @@ export default function Page() {
                                         </SettingsSectionDescription>
                                     </SettingsSectionHeader>
                                     <SettingsSectionBody>
+                                        <DomainPicker
+                                            orgId={orgId as string}
+                                            onDomainChange={(res) => {
+                                                tcpUdpForm.setValue(
+                                                    "subdomain",
+                                                    res.subdomain
+                                                );
+                                                tcpUdpForm.setValue(
+                                                    "domainId",
+                                                    res.domainId
+                                                );
+                                            }}
+                                        />
                                         <SettingsSectionForm>
                                             <Form {...tcpUdpForm}>
                                                 <form
                                                     className="space-y-4"
                                                     id="tcp-udp-settings-form"
                                                 >
+                                                    <FormField
+                                                        control={tcpUdpForm.control}
+                                                        name="subdomain"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>
+                                                                    {t("subdomain")}
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Input {...field} />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                                <FormDescription>
+                                                                    {t("subdomnainDescription")}
+                                                                </FormDescription>
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                     <Controller
                                                         control={
                                                             tcpUdpForm.control
