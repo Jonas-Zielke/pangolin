@@ -382,7 +382,15 @@ export async function traefikConfigProvider(
                 config_output[protocol].routers[routerName] = {
                     entryPoints: [`${protocol}-${port}`],
                     service: serviceName,
-                    ...(protocol === "tcp" ? { rule: "HostSNI(`*`)" } : {})
+                    ...(protocol === "tcp"
+                        ? {
+                              rule: `HostSNI(${
+                                  resource.fullDomain
+                                      ? `\`${resource.fullDomain}\``
+                                      : "`*`"
+                              })`
+                          }
+                        : {})
                 };
 
                 config_output[protocol].services[serviceName] = {
