@@ -93,12 +93,23 @@ const updateRawResourceBodySchema = z
         name: z.string().min(1).max(255).optional(),
         proxyPort: z.number().int().min(1).max(65535).optional(),
         stickySession: z.boolean().optional(),
-        enabled: z.boolean().optional()
+        enabled: z.boolean().optional(),
+        domainId: z.string().optional(),
+        subdomain: z.string().nullable().optional()
     })
     .strict()
     .refine((data) => Object.keys(data).length > 0, {
         message: "At least one field must be provided for update"
     })
+    .refine(
+        (data) => {
+            if (data.subdomain) {
+                return subdomainSchema.safeParse(data.subdomain).success;
+            }
+            return true;
+        },
+        { message: "Invalid subdomain" }
+    )
     .refine(
         (data) => {
             if (!config.getRawConfig().flags?.allow_raw_resources) {
@@ -389,29 +400,103 @@ async function updateRawResource(
 
     const updateData = parsedBody.data;
 
-    if (updateData.proxyPort) {
-        const proxyPort = updateData.proxyPort;
-        const existingResource = await db
+    if (updateData.domainId !== undefined || updateData.subdomain !== undefined) {
+        const domainId = updateData.domainId ?? resource.domainId;
+        if (!domainId) {
+            return next(
+                createHttpError(HttpCode.BAD_REQUEST, "Domain ID is required")
+            );
+        }
+
+        const [domainRes] = await db
             .select()
-            .from(resources)
-            .where(
-                and(
-                    eq(resources.protocol, resource.protocol),
-                    eq(resources.proxyPort, proxyPort!)
-                )
+            .from(domains)
+            .where(eq(domains.domainId, domainId))
+            .leftJoin(
+                orgDomains,
+                and(eq(orgDomains.orgId, resource.orgId), eq(orgDomains.domainId, domainId))
             );
 
-        if (
-            existingResource.length > 0 &&
-            existingResource[0].resourceId !== resource.resourceId
-        ) {
+        if (!domainRes || !domainRes.domains) {
             return next(
                 createHttpError(
-                    HttpCode.CONFLICT,
-                    "Resource with that protocol and port already exists"
+                    HttpCode.NOT_FOUND,
+                    `Domain with ID ${domainId} not found`
                 )
             );
         }
+
+        if (domainRes.orgDomains && domainRes.orgDomains.orgId !== resource.orgId) {
+            return next(
+                createHttpError(
+                    HttpCode.FORBIDDEN,
+                    `You do not have permission to use domain with ID ${domainId}`
+                )
+            );
+        }
+
+        if (!domainRes.domains.verified) {
+            return next(
+                createHttpError(
+                    HttpCode.BAD_REQUEST,
+                    `Domain with ID ${domainId} is not verified`
+                )
+            );
+        }
+
+        const newSub = updateData.subdomain !== undefined ? updateData.subdomain : resource.subdomain;
+        let fullDomain = "";
+
+        if (domainRes.domains.type == "ns") {
+            if (newSub) {
+                fullDomain = `${newSub}.${domainRes.domains.baseDomain}`;
+            } else {
+                fullDomain = domainRes.domains.baseDomain;
+            }
+        } else if (domainRes.domains.type == "cname") {
+            fullDomain = domainRes.domains.baseDomain;
+        } else if (domainRes.domains.type == "wildcard") {
+            if (newSub !== undefined) {
+                const parsedSubdomain = subdomainSchema.safeParse(newSub);
+                if (!parsedSubdomain.success) {
+                    return next(
+                        createHttpError(
+                            HttpCode.BAD_REQUEST,
+                            fromError(parsedSubdomain.error).toString()
+                        )
+                    );
+                }
+                fullDomain = `${newSub}.${domainRes.domains.baseDomain}`;
+            } else {
+                fullDomain = domainRes.domains.baseDomain;
+            }
+        }
+
+        fullDomain = fullDomain.toLowerCase();
+
+        const [existingDomain] = await db
+            .select()
+            .from(resources)
+            .where(eq(resources.fullDomain, fullDomain));
+
+        if (existingDomain && existingDomain.resourceId !== resource.resourceId) {
+            return next(
+                createHttpError(HttpCode.CONFLICT, "Resource with that domain already exists")
+            );
+        }
+
+        if (fullDomain && fullDomain !== resource.fullDomain) {
+            await db
+                .update(resources)
+                .set({ fullDomain })
+                .where(eq(resources.resourceId, resource.resourceId));
+        }
+
+        if (fullDomain === domainRes.domains.baseDomain) {
+            updateData.subdomain = null;
+        }
+
+        updateData.domainId = domainId;
     }
 
     const updatedResource = await db
