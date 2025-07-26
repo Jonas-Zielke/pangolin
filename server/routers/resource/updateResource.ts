@@ -94,22 +94,12 @@ const updateRawResourceBodySchema = z
         proxyPort: z.number().int().min(1).max(65535).optional(),
         stickySession: z.boolean().optional(),
         enabled: z.boolean().optional(),
-        domainId: z.string().optional(),
-        subdomain: z.string().nullable().optional()
+        domainId: z.string().optional()
     })
     .strict()
     .refine((data) => Object.keys(data).length > 0, {
         message: "At least one field must be provided for update"
     })
-    .refine(
-        (data) => {
-            if (data.subdomain) {
-                return subdomainSchema.safeParse(data.subdomain).success;
-            }
-            return true;
-        },
-        { message: "Invalid subdomain" }
-    )
     .refine(
         (data) => {
             if (!config.getRawConfig().flags?.allow_raw_resources) {
@@ -400,7 +390,7 @@ async function updateRawResource(
 
     const updateData = parsedBody.data;
 
-    if (updateData.domainId !== undefined || updateData.subdomain !== undefined) {
+    if (updateData.domainId !== undefined) {
         const domainId = updateData.domainId ?? resource.domainId;
         if (!domainId) {
             return next(
@@ -444,35 +434,7 @@ async function updateRawResource(
             );
         }
 
-        const newSub = updateData.subdomain !== undefined ? updateData.subdomain : resource.subdomain;
-        let fullDomain = "";
-
-        if (domainRes.domains.type == "ns") {
-            if (newSub) {
-                fullDomain = `${newSub}.${domainRes.domains.baseDomain}`;
-            } else {
-                fullDomain = domainRes.domains.baseDomain;
-            }
-        } else if (domainRes.domains.type == "cname") {
-            fullDomain = domainRes.domains.baseDomain;
-        } else if (domainRes.domains.type == "wildcard") {
-            if (newSub !== undefined) {
-                const parsedSubdomain = subdomainSchema.safeParse(newSub);
-                if (!parsedSubdomain.success) {
-                    return next(
-                        createHttpError(
-                            HttpCode.BAD_REQUEST,
-                            fromError(parsedSubdomain.error).toString()
-                        )
-                    );
-                }
-                fullDomain = `${newSub}.${domainRes.domains.baseDomain}`;
-            } else {
-                fullDomain = domainRes.domains.baseDomain;
-            }
-        }
-
-        fullDomain = fullDomain.toLowerCase();
+        let fullDomain = domainRes.domains.baseDomain.toLowerCase();
 
         const [existingDomain] = await db
             .select()
@@ -491,11 +453,6 @@ async function updateRawResource(
                 .set({ fullDomain })
                 .where(eq(resources.resourceId, resource.resourceId));
         }
-
-        if (fullDomain === domainRes.domains.baseDomain) {
-            updateData.subdomain = null;
-        }
-
         updateData.domainId = domainId;
     }
 
