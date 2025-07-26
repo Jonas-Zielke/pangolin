@@ -103,7 +103,37 @@ Pangolin is a self-hosted tunneled reverse proxy server with identity and access
 
 - Easily expose **IoT devices**, **edge servers**, or **Raspberry Pi** to the internet for field equipment monitoring.
 
+
 <img src="public/screenshots/sites.png" alt="Sites"/>
+
+### Configuring TCP/UDP Resources
+
+When creating a raw TCP or UDP resource you may need to add a custom Traefik `entryPoint` and expose the port on your exit node.
+Copy the snippets below and replace `1234` with your port number.
+
+```yaml
+entryPoints:
+  tcp-1234:
+    address: ":1234/tcp"
+```
+
+```yaml
+ports:
+  - "1234:1234"
+```
+
+For UDP resources the snippets become:
+
+```yaml
+entryPoints:
+  udp-1234:
+    address: ":1234/udp"
+```
+
+```yaml
+ports:
+  - "1234:1234/udp"
+```
 
 ## Deployment Options
 
