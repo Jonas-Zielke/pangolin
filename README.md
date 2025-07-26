@@ -61,6 +61,8 @@ Pangolin is a self-hosted tunneled reverse proxy server with identity and access
 - Built-in support for any WireGuard client.
 - Automated **SSL certificates** (https) via [LetsEncrypt](https://letsencrypt.org/).
 - Support for HTTP/HTTPS and **raw TCP/UDP services**.
+- Each TCP/UDP port must be declared as an `entryPoint` in `config/traefik/traefik_config.yml`. See [docs/traefik-entrypoints.md](./docs/traefik-entrypoints.md).
+- Multiple TCP services can share the same port when using SNI.
 - Raw TCP/UDP resources no longer accept a `subdomain` field.
 - Load balancing.
 - Extend functionality with existing [Traefik](https://github.com/traefik/traefik) plugins, such as [CrowdSec](https://plugins.traefik.io/plugins/6335346ca4caa9ddeffda116/crowdsec-bouncer-traefik-plugin) and [Geoblock](https://github.com/PascalMinder/geoblock).
