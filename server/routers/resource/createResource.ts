@@ -60,8 +60,7 @@ const createRawResourceSchema = z
         http: z.boolean(),
         protocol: z.enum(["tcp", "udp"]),
         proxyPort: z.number().int().min(1).max(65535),
-        domainId: z.string().optional(),
-        subdomain: z.string().nullable().optional()
+        domainId: z.string().optional()
     })
     .strict()
     .refine(
@@ -76,15 +75,6 @@ const createRawResourceSchema = z
         {
             message: "Raw resources are not allowed"
         }
-    )
-    .refine(
-        (data) => {
-            if (data.subdomain) {
-                return subdomainSchema.safeParse(data.subdomain).success;
-            }
-            return true;
-        },
-        { message: "Invalid subdomain" }
     );
 
 export type CreateResourceResponse = Resource;
@@ -390,7 +380,6 @@ async function createRawResource(
     }
 
     const { name, http, protocol, proxyPort, domainId } = parsedBody.data;
-    let subdomain = parsedBody.data.subdomain;
     let fullDomain: string | undefined;
 
     if (domainId) {
@@ -430,34 +419,7 @@ async function createRawResource(
             );
         }
 
-        if (domainRes.domains.type == "ns") {
-            if (subdomain) {
-                fullDomain = `${subdomain}.${domainRes.domains.baseDomain}`;
-            } else {
-                fullDomain = domainRes.domains.baseDomain;
-            }
-        } else if (domainRes.domains.type == "cname") {
-            fullDomain = domainRes.domains.baseDomain;
-        } else if (domainRes.domains.type == "wildcard") {
-            if (subdomain) {
-                const parsedSubdomain = subdomainSchema.safeParse(subdomain);
-                if (!parsedSubdomain.success) {
-                    return next(
-                        createHttpError(
-                            HttpCode.BAD_REQUEST,
-                            fromError(parsedSubdomain.error).toString()
-                        )
-                    );
-                }
-                fullDomain = `${subdomain}.${domainRes.domains.baseDomain}`;
-            } else {
-                fullDomain = domainRes.domains.baseDomain;
-            }
-        }
-
-        if (fullDomain === domainRes.domains.baseDomain) {
-            subdomain = null;
-        }
+        fullDomain = domainRes.domains.baseDomain;
 
         fullDomain = fullDomain!.toLowerCase();
 
@@ -489,7 +451,6 @@ async function createRawResource(
                 protocol,
                 proxyPort,
                 domainId,
-                subdomain,
                 fullDomain
             })
             .returning();
