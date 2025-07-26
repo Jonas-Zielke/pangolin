@@ -120,7 +120,7 @@ export default function GeneralForm() {
 
     const GeneralFormSchema = z.object({
         enabled: z.boolean(),
-        subdomain: z.string().optional(),
+        subdomain: subdomainSchema.optional(),
         name: z.string().min(1).max(255),
         domainId: z.string().optional(),
         proxyPort: z.number().int().min(1).max(65535).optional()
@@ -351,6 +351,37 @@ export default function GeneralForm() {
 
                                         {!resource.http && (
                                             <>
+                                                <DomainPicker
+                                                    orgId={orgId as string}
+                                                    onDomainChange={(res) => {
+                                                        form.setValue(
+                                                            "subdomain",
+                                                            res.subdomain
+                                                        );
+                                                        form.setValue(
+                                                            "domainId",
+                                                            res.domainId
+                                                        );
+                                                    }}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="subdomain"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                {t("subdomain")}
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <Input {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                            <FormDescription>
+                                                                {t("subdomnainDescription")}
+                                                            </FormDescription>
+                                                        </FormItem>
+                                                    )}
+                                                />
                                                 <FormField
                                                     control={form.control}
                                                     name="proxyPort"
