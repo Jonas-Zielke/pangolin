@@ -96,6 +96,12 @@ export class Config {
             : "false";
 
         this.rawConfig = parsedConfig;
+
+        if (this.rawConfig.server.secret === "your_secret_key_here") {
+            console.log(
+                "WARNING: You are using the default server secret. Please set a unique value to keep sessions secure."
+            );
+        }
     }
 
     public async initServer() {
