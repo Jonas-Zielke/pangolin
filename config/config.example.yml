@@ -23,6 +23,13 @@ server:
         id: "P-Access-Token-Id"
         token: "P-Access-Token"
     resource_session_request_param: "p_session_request"
+    cors:
+        # Allowed origins for API requests. If omitted, defaults to the
+        # dashboard_url above.
+        origins:
+            - "http://localhost:3002"
+        # Enable if API requests should include credentials (cookies).
+        credentials: false
 
 traefik:
     http_entrypoint: "web"
