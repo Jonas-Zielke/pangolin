@@ -32,19 +32,16 @@ export function createApiServer() {
 
     const corsConfig = config.getRawConfig().server.cors;
 
+    const allowedOrigins =
+        corsConfig?.origins || [config.getRawConfig().app.dashboard_url];
+
     const options = {
-        ...(corsConfig?.origins
-            ? { origin: corsConfig.origins }
-            : {
-                  origin: (origin: any, callback: any) => {
-                      callback(null, true);
-                  }
-              }),
+        origin: allowedOrigins,
         ...(corsConfig?.methods && { methods: corsConfig.methods }),
         ...(corsConfig?.allowed_headers && {
             allowedHeaders: corsConfig.allowed_headers
         }),
-        credentials: !(corsConfig?.credentials === false)
+        credentials: corsConfig?.credentials === true
     };
 
     logger.debug("Using CORS options", options);
