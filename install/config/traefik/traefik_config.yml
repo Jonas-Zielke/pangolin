@@ -45,4 +45,4 @@ entryPoints:
         certResolver: "letsencrypt"
 
 serversTransport:
-  insecureSkipVerify: true
+  insecureSkipVerify: false
