@@ -168,6 +168,21 @@ If interested, [contact us](mailto:numbat@fossorial.io).
 
 We want to hear your feature requests! Add them to the [discussion board](https://github.com/orgs/fosrl/discussions/categories/feature-requests).
 
+## Password Hashing
+
+Pangolin uses Argon2id to securely hash secrets. The default configuration
+balances security with server performance:
+
+```
+memoryCost: 65536
+timeCost: 3
+outputLen: 32
+parallelism: 1
+```
+
+You can adjust these values in `server/auth/password.ts` if your hardware
+requires less intensive hashing.
+
 ## Licensing
 
 Pangolin is dual licensed under the AGPL-3 and the Fossorial Commercial license. For inquiries about commercial licensing, please contact us at [numbat@fossorial.io](mailto:numbat@fossorial.io).
