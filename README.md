@@ -172,6 +172,18 @@ We want to hear your feature requests! Add them to the [discussion board](https:
 
 Pangolin is dual licensed under the AGPL-3 and the Fossorial Commercial license. For inquiries about commercial licensing, please contact us at [numbat@fossorial.io](mailto:numbat@fossorial.io).
 
+## Migrating Encrypted Data
+
+`server/lib/crypto.ts` now uses AES-256-GCM with a unique IV. Existing values
+encrypted with the previous scheme will need to be re-encrypted. To migrate:
+
+1. Checkout the commit before this change and run a small script to read each
+   secret from the database using the old `decrypt` function.
+2. Upgrade to the new version and reinsert the values using the updated
+   `encrypt` function.
+
+Values that are not re-encrypted will fail to decrypt after upgrading.
+
 ## Contributions
 
 Looking for something to contribute? Take a look at issues marked with [help wanted](https://github.com/fosrl/pangolin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22help%20wanted%22).
