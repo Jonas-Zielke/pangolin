@@ -130,7 +130,8 @@ export const configSchema = z
                 https_entrypoint: z.string().optional().default("websecure"),
                 additional_middlewares: z.array(z.string()).optional(),
                 cert_resolver: z.string().optional().default("letsencrypt"),
-                prefer_wildcard_cert: z.boolean().optional().default(false)
+                prefer_wildcard_cert: z.boolean().optional().default(false),
+                insecure_skip_verify: z.boolean().optional().default(false)
             })
             .optional()
             .default({}),

@@ -355,9 +355,11 @@ export async function traefikConfigProvider(
                     }
                     config_output.http.serversTransports![transportName] = {
                         serverName: resource.tlsServerName,
-                        //unfortunately the following needs to be set. traefik doesn't merge the default serverTransport settings
-                        // if defined in the static config and here. if not set, self-signed certs won't work
-                        insecureSkipVerify: true
+                        // unfortunately the following needs to be set. Traefik doesn't merge the default serversTransport settings
+                        // if defined in the static config and here. Use the configuration option to override when needed.
+                        insecureSkipVerify:
+                            config.getRawConfig().traefik.insecure_skip_verify ??
+                            false
                     };
                     config_output.http.services![
                         serviceName
