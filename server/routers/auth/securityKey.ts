@@ -33,6 +33,11 @@ import { UserType } from "@server/types/UserTypes";
 import { verifyPassword } from "@server/auth/password";
 import { unauthorized } from "@server/auth/unauthorizedResponse";
 import { verifyTotpCode } from "@server/auth/totp";
+import {
+    CSRF_COOKIE_NAME,
+    generateCsrfToken,
+    setCsrfToken
+} from "@server/auth/csrf";
 
 // The RP ID is the domain name of your application
 const rpID = (() => {
@@ -694,6 +699,13 @@ export async function verifyAuthentication(
         );
 
         res.setHeader("Set-Cookie", cookie);
+        const csrfToken = generateCsrfToken();
+        setCsrfToken(token, csrfToken);
+        res.cookie(CSRF_COOKIE_NAME, csrfToken, {
+            httpOnly: false,
+            sameSite: "lax",
+            secure: isSecure
+        });
 
         // Clear challenge data
         await clearChallenge(tempSessionId);

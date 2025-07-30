@@ -15,6 +15,11 @@ import {
     generateSessionToken,
     serializeSessionCookie
 } from "@server/auth/sessions/app";
+import {
+    CSRF_COOKIE_NAME,
+    generateCsrfToken,
+    setCsrfToken
+} from "@server/auth/csrf";
 import config from "@server/lib/config";
 import logger from "@server/logger";
 import { hashPassword } from "@server/auth/password";
@@ -186,6 +191,13 @@ export async function signup(
             new Date(sess.expiresAt)
         );
         res.appendHeader("Set-Cookie", cookie);
+        const csrfToken = generateCsrfToken();
+        setCsrfToken(token, csrfToken);
+        res.cookie(CSRF_COOKIE_NAME, csrfToken, {
+            httpOnly: false,
+            sameSite: "lax",
+            secure: isSecure
+        });
 
         if (config.getRawConfig().flags?.require_email_verification) {
             sendEmailVerificationCode(email, userId);
