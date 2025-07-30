@@ -31,7 +31,7 @@ export function createIntegrationApiServer() {
         apiServer.use(helmet());
     }
 
-    apiServer.use(cookieParser());
+    apiServer.use(cookieParser(config.getRawConfig().server.secret));
     apiServer.use(express.json());
 
     apiServer.use(

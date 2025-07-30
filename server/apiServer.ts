@@ -51,13 +51,13 @@ export function createApiServer() {
 
     apiServer.use(cors(options));
 
+    apiServer.use(cookieParser(config.getRawConfig().server.secret));
+    apiServer.use(express.json());
+
     if (!dev) {
         apiServer.use(helmet());
         apiServer.use(csrfProtectionMiddleware);
     }
-
-    apiServer.use(cookieParser());
-    apiServer.use(express.json());
 
     // Add request timeout middleware
     apiServer.use(requestTimeoutMiddleware(60000)); // 60 second timeout

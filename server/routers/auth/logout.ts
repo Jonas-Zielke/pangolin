@@ -7,6 +7,11 @@ import {
     createBlankSessionTokenCookie,
     invalidateSession
 } from "@server/auth/sessions/app";
+import {
+    CSRF_COOKIE_NAME,
+    deleteCsrfToken
+} from "@server/auth/csrf";
+import { SESSION_COOKIE_NAME } from "@server/auth/sessions/app";
 import { verifySession } from "@server/auth/sessions/verifySession";
 import config from "@server/lib/config";
 
@@ -39,6 +44,8 @@ export async function logout(
 
         const isSecure = req.protocol === "https";
         res.setHeader("Set-Cookie", createBlankSessionTokenCookie(isSecure));
+        deleteCsrfToken(req.cookies[SESSION_COOKIE_NAME] ?? "");
+        res.clearCookie(CSRF_COOKIE_NAME);
 
         return response<null>(res, {
             data: null,

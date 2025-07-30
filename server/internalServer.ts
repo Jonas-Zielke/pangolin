@@ -17,7 +17,7 @@ export function createInternalServer() {
 
     internalServer.use(helmet());
     internalServer.use(cors());
-    internalServer.use(cookieParser());
+    internalServer.use(cookieParser(config.getRawConfig().server.secret));
     internalServer.use(express.json());
 
     const prefix = `/api/v1`;

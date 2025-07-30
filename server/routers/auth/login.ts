@@ -3,6 +3,11 @@ import {
     generateSessionToken,
     serializeSessionCookie
 } from "@server/auth/sessions/app";
+import {
+    CSRF_COOKIE_NAME,
+    generateCsrfToken,
+    setCsrfToken
+} from "@server/auth/csrf";
 import { db } from "@server/db";
 import { users, securityKeys } from "@server/db";
 import HttpCode from "@server/types/HttpCode";
@@ -177,6 +182,13 @@ export async function login(
         );
 
         res.appendHeader("Set-Cookie", cookie);
+        const csrfToken = generateCsrfToken();
+        setCsrfToken(token, csrfToken);
+        res.cookie(CSRF_COOKIE_NAME, csrfToken, {
+            httpOnly: false,
+            sameSite: "lax",
+            secure: isSecure
+        });
 
         if (
             !existingUser.emailVerified &&
