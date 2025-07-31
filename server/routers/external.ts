@@ -14,6 +14,7 @@ import * as accessToken from "./accessToken";
 import * as idp from "./idp";
 import * as license from "./license";
 import * as apiKeys from "./apiKeys";
+import * as security from "./security";
 import HttpCode from "@server/types/HttpCode";
 import {
     verifyAccessTokenAccess,
@@ -671,6 +672,17 @@ authenticated.post(
     "/license/recheck",
     verifyUserIsServerAdmin,
     license.recheckStatus
+);
+
+authenticated.get(
+    "/security",
+    verifyUserIsServerAdmin,
+    security.getStatus
+);
+authenticated.post(
+    "/security",
+    verifyUserIsServerAdmin,
+    security.updateSecurity
 );
 
 authenticated.get(

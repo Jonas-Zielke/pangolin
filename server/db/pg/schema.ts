@@ -407,6 +407,19 @@ export const resourceRules = pgTable("resourceRules", {
     value: varchar("value").notNull()
 });
 
+export const securityPackRules = pgTable("securityPackRules", {
+    ruleId: serial("ruleId").primaryKey(),
+    name: varchar("name").notNull(),
+    value: integer("value"),
+    enabled: boolean("enabled").notNull().default(true)
+});
+
+export const globalThrottles = pgTable("globalThrottles", {
+    throttleId: serial("throttleId").primaryKey(),
+    name: varchar("name").notNull(),
+    value: integer("value").notNull()
+});
+
 export const supporterKey = pgTable("supporterKey", {
     keyId: serial("keyId").primaryKey(),
     key: varchar("key").notNull(),
@@ -629,3 +642,5 @@ export type OlmSession = InferSelectModel<typeof olmSessions>;
 export type UserClient = InferSelectModel<typeof userClients>;
 export type RoleClient = InferSelectModel<typeof roleClients>;
 export type OrgDomains = InferSelectModel<typeof orgDomains>;
+export type SecurityPackRule = InferSelectModel<typeof securityPackRules>;
+export type GlobalThrottle = InferSelectModel<typeof globalThrottles>;

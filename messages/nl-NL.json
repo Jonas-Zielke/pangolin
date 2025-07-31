@@ -1096,6 +1096,7 @@
     "sidebarLicense": "Licentie",
     "sidebarClients": "Cliënten",
     "sidebarDomains": "Domeinen",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Docker Socket inschakelen",
     "enableDockerSocketDescription": "Docker Socket-ontdekking inschakelen voor het invullen van containerinformatie. Socket-pad moet aan Newt worden verstrekt.",
     "enableDockerSocketLink": "Meer informatie",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "DNS-wijzigingen kunnen enige tijd duren om over het internet te worden verspreid. Dit kan enkele minuten tot 48 uur duren, afhankelijk van je DNS-provider en TTL-instellingen.",
     "resourcePortRequired": "Poortnummer is vereist voor niet-HTTP-bronnen",
     "resourcePortNotAllowed": "Poortnummer mag niet worden ingesteld voor HTTP-bronnen"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }

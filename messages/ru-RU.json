@@ -1096,6 +1096,7 @@
     "sidebarLicense": "Лицензия",
     "sidebarClients": "Clients",
     "sidebarDomains": "Domains",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Включить Docker Socket",
     "enableDockerSocketDescription": "Включить обнаружение Docker Socket для заполнения информации о контейнерах. Путь к сокету должен быть предоставлен Newt.",
     "enableDockerSocketLink": "Узнать больше",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "DNS changes may take some time to propagate across the internet. This can take anywhere from a few minutes to 48 hours, depending on your DNS provider and TTL settings.",
     "resourcePortRequired": "Port number is required for non-HTTP resources",
     "resourcePortNotAllowed": "Port number should not be set for HTTP resources"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }

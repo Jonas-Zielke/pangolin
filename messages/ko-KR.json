@@ -1096,6 +1096,7 @@
     "sidebarLicense": "라이선스",
     "sidebarClients": "클라이언트",
     "sidebarDomains": "도메인",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Docker 소켓 활성화",
     "enableDockerSocketDescription": "컨테이너 정보를 채우기 위해 Docker 소켓 검색을 활성화합니다. 소켓 경로는 Newt에 제공되어야 합니다.",
     "enableDockerSocketLink": "자세히 알아보기",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "DNS 변경 사항은 인터넷 전체에 전파되는 데 시간이 걸립니다. DNS 제공자와 TTL 설정에 따라 몇 분에서 48시간까지 걸릴 수 있습니다.",
     "resourcePortRequired": "HTTP 리소스가 아닌 경우 포트 번호가 필요합니다",
     "resourcePortNotAllowed": "HTTP 리소스에 대해 포트 번호를 설정하지 마세요"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }

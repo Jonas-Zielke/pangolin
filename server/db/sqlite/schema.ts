@@ -536,6 +536,19 @@ export const resourceRules = sqliteTable("resourceRules", {
     value: text("value").notNull()
 });
 
+export const securityPackRules = sqliteTable("securityPackRules", {
+    ruleId: integer("ruleId").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    value: integer("value"),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true)
+});
+
+export const globalThrottles = sqliteTable("globalThrottles", {
+    throttleId: integer("throttleId").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    value: integer("value").notNull()
+});
+
 export const supporterKey = sqliteTable("supporterKey", {
     keyId: integer("keyId").primaryKey({ autoIncrement: true }),
     key: text("key").notNull(),
@@ -674,3 +687,5 @@ export type ApiKey = InferSelectModel<typeof apiKeys>;
 export type ApiKeyAction = InferSelectModel<typeof apiKeyActions>;
 export type ApiKeyOrg = InferSelectModel<typeof apiKeyOrg>;
 export type OrgDomains = InferSelectModel<typeof orgDomains>;
+export type SecurityPackRule = InferSelectModel<typeof securityPackRules>;
+export type GlobalThrottle = InferSelectModel<typeof globalThrottles>;

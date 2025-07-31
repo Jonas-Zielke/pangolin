@@ -1096,6 +1096,7 @@
     "sidebarLicense": "Lisans",
     "sidebarClients": "Müşteriler",
     "sidebarDomains": "Alan Adları",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Docker Soketi Etkinleştir",
     "enableDockerSocketDescription": "Konteyner bilgilerini doldurmak için Docker Socket keşfini etkinleştirin. Socket yolu Newt'e sağlanmalıdır.",
     "enableDockerSocketLink": "Daha fazla bilgi",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "DNS değişikliklerinin internet genelinde yayılması zaman alabilir. DNS sağlayıcınız ve TTL ayarlarına bağlı olarak bu birkaç dakika ile 48 saat arasında değişebilir.",
     "resourcePortRequired": "HTTP dışı kaynaklar için bağlantı noktası numarası gereklidir",
     "resourcePortNotAllowed": "HTTP kaynakları için bağlantı noktası numarası ayarlanmamalı"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }

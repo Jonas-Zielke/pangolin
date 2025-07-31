@@ -1096,6 +1096,7 @@
     "sidebarLicense": "Licenza",
     "sidebarClients": "Clienti",
     "sidebarDomains": "Domini",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Abilita Docker Socket",
     "enableDockerSocketDescription": "Abilita il rilevamento Docker Socket per popolare le informazioni del contenitore. Il percorso del socket deve essere fornito a Newt.",
     "enableDockerSocketLink": "Scopri di più",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "Le modifiche DNS possono richiedere del tempo per propagarsi in Internet. Questo può richiedere da pochi minuti a 48 ore, a seconda del tuo provider DNS e delle impostazioni TTL.",
     "resourcePortRequired": "Numero di porta richiesto per risorse non-HTTP",
     "resourcePortNotAllowed": "Il numero di porta non deve essere impostato per risorse HTTP"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }
