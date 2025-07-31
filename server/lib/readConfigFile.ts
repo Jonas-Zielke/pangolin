@@ -124,6 +124,11 @@ export const configSchema = z
                     .optional()
             })
             .optional(),
+        redis: z
+            .object({
+                connection_string: z.string()
+            })
+            .optional(),
         traefik: z
             .object({
                 http_entrypoint: z.string().optional().default("web"),
@@ -171,6 +176,10 @@ export const configSchema = z
             }),
         rate_limits: z
             .object({
+                store: z
+                    .enum(["memory", "redis", "database"])
+                    .optional()
+                    .default("memory"),
                 global: z
                     .object({
                         window_minutes: z

@@ -36,7 +36,11 @@ gerbil:
     subnet_group: 100.89.137.0/20
     use_subdomain: true
 
+redis:
+    connection_string: "redis://localhost:6379"
+
 rate_limits:
+    store: "memory"
     global:
         window_minutes: 1
         max_requests: 500
