@@ -51,12 +51,12 @@ export function createApiServer() {
 
     apiServer.use(cors(options));
 
+    apiServer.use(cookieParser());
+
     if (!dev) {
         apiServer.use(helmet());
         apiServer.use(csrfProtectionMiddleware);
     }
-
-    apiServer.use(cookieParser());
     apiServer.use(express.json());
 
     // Add request timeout middleware
