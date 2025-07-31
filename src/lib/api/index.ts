@@ -1,6 +1,14 @@
 import { Env } from "@app/lib/types/env";
 import axios, { AxiosInstance } from "axios";
 
+function getCsrfToken(): string {
+    if (typeof document === "undefined") {
+        return "";
+    }
+    const match = document.cookie.match(/(?:^|; )csrfToken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : "";
+}
+
 let apiInstance: AxiosInstance | null = null;
 
 export function createApiClient({ env }: { env: Env }): AxiosInstance {
@@ -34,7 +42,7 @@ export function createApiClient({ env }: { env: Env }): AxiosInstance {
         timeout: 10000,
         headers: {
             "Content-Type": "application/json",
-            "X-CSRF-Token": "x-csrf-protection"
+            "X-CSRF-Token": getCsrfToken()
         }
     });
 
@@ -47,7 +55,7 @@ export const internal = axios.create({
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",
-        "X-CSRF-Token": "x-csrf-protection"
+        "X-CSRF-Token": getCsrfToken()
     }
 });
 

@@ -1,23 +1,29 @@
+import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 
-export function csrfProtectionMiddleware(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
-    const csrfToken = req.headers["x-csrf-token"];
+const TOKEN_COOKIE = "csrfToken";
+const TOKEN_HEADER = "x-csrf-token";
 
-    // Skip CSRF check for GET requests as they should be idempotent
-    if (req.method === "GET") {
-        next();
-        return;
+export function csrfProtectionMiddleware(req: Request, res: Response, next: NextFunction) {
+    // For safe methods just ensure a token cookie is present
+    if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+        if (!req.cookies[TOKEN_COOKIE]) {
+            const token = crypto.randomBytes(32).toString("hex");
+            res.cookie(TOKEN_COOKIE, token, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: req.protocol === "https",
+                path: "/"
+            });
+        }
+        return next();
     }
 
-    if (!csrfToken || csrfToken !== "x-csrf-protection") {
-        res.status(403).json({
-            error: "CSRF token missing or invalid"
-        });
-        return;
+    const tokenFromCookie = req.cookies[TOKEN_COOKIE];
+    const tokenFromHeader = req.headers[TOKEN_HEADER] as string | undefined;
+
+    if (!tokenFromCookie || !tokenFromHeader || tokenFromCookie !== tokenFromHeader) {
+        return res.status(403).json({ error: "CSRF token missing or invalid" });
     }
 
     next();

@@ -133,7 +133,9 @@ export async function validateOidcCallback(
 
         const stateObj = z
             .object({
-                redirectUrl: z.string(),
+                redirectUrl: z
+                    .string()
+                    .regex(/^\/[\S]*$/, "redirectUrl must be a relative path"),
                 state: z.string(),
                 codeVerifier: z.string()
             })

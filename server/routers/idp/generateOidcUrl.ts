@@ -23,7 +23,9 @@ const paramsSchema = z
 
 const bodySchema = z
     .object({
-        redirectUrl: z.string()
+        redirectUrl: z
+            .string()
+            .regex(/^\/[\S]*$/, "redirectUrl must be a relative path")
     })
     .strict();
 
