@@ -208,6 +208,13 @@ export const configSchema = z
             })
             .optional()
             .default({}),
+        security_pack: z
+            .object({
+                syn_flood_protection: z.boolean().optional().default(false),
+                icmp_rate_limit: z.number().int().nonnegative().optional().default(0)
+            })
+            .optional()
+            .default({}),
         email: z
             .object({
                 smtp_host: z.string().optional(),

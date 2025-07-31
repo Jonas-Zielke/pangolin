@@ -95,6 +95,13 @@ export class Config {
             ? "true"
             : "false";
 
+        process.env.SECURITY_PACK_SYN_FLOOD = parsedConfig.security_pack?.syn_flood_protection
+            ? "true"
+            : "false";
+        process.env.SECURITY_PACK_ICMP_RATE = String(
+            parsedConfig.security_pack?.icmp_rate_limit ?? 0
+        );
+
         this.rawConfig = parsedConfig;
     }
 

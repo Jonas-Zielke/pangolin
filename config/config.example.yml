@@ -40,6 +40,9 @@ rate_limits:
     global:
         window_minutes: 1
         max_requests: 500
+security_pack:
+    syn_flood_protection: false
+    icmp_rate_limit: 10
 
 flags:
     require_email_verification: false

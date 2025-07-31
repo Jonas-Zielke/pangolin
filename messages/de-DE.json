@@ -1096,6 +1096,7 @@
     "sidebarLicense": "Lizenz",
     "sidebarClients": "Kunden",
     "sidebarDomains": "Domains",
+    "sidebarSecurity": "Security"
     "enableDockerSocket": "Docker Socket aktivieren",
     "enableDockerSocketDescription": "Docker Socket-Erkennung aktivieren, um Container-Informationen zu befüllen. Socket-Pfad muss Newt bereitgestellt werden.",
     "enableDockerSocketLink": "Mehr erfahren",
@@ -1274,4 +1275,8 @@
     "createDomainDnsPropagationDescription": "Es kann einige Zeit dauern, bis DNS-Änderungen im Internet verbreitet werden. Dies kann je nach Ihrem DNS-Provider und den TTL-Einstellungen von einigen Minuten bis zu 48 Stunden dauern.",
     "resourcePortRequired": "Portnummer ist für nicht-HTTP-Ressourcen erforderlich",
     "resourcePortNotAllowed": "Portnummer sollte für HTTP-Ressourcen nicht gesetzt werden"
+    "securityPack": "Security Pack",
+    "securityPackDescription": "Configure firewall protections.",
+    "synFloodProtection": "SYN Flood Protection",
+    "icmpRateLimit": "ICMP Rate Limit"
 }
